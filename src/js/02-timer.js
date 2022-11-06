@@ -4,9 +4,8 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const refs = {
     calendarEl: document.querySelector('[id = "datetime-picker"]'),
-    startTimerBtnEL: document.querySelector('[data-start]'),
-    timerWrapEl: document.querySelector('.timer'),
-    timerFieldEls: document.querySelectorAll('.field'),
+    startTimerBtn: document.querySelector('[data-start]'),
+    timerValueEls: document.querySelectorAll('.value'),
     daysEl: document.querySelector('[data-days]'),
     hoursEl: document.querySelector('[data-hours]'),
     minutesEl: document.querySelector('[data-minutes]'),
@@ -16,13 +15,13 @@ const refs = {
 let saleEndDate = null;
 let timerId = null;
 
-startBtnDisabled();
+disableStartBtn();
 
-refs.startTimerBtnEL.addEventListener('click', () => {
+refs.startTimerBtn.addEventListener('click', () => {
     onStartTimer();
     clearInterval(timerId);
     timerId = setInterval(onStartTimer, 1000);
-    startBtnDisabled();
+    disableStartBtn();
 });
 
 flatpickr(refs.calendarEl, {
@@ -32,24 +31,21 @@ flatpickr(refs.calendarEl, {
     minuteIncrement: 1,
     onClose(selectedDates) {
         if (selectedDates[0] < Date.now()) {
-            startBtnDisabled();
+            disableStartBtn();
             notifyFailure();
             return '';
         }
-        startBtnAnabled();
+        AnableStartBtn();
         saleEndDate = selectedDates[0];
         clearInterval(timerId);
-        refs.daysEl.textContent = '00';
-        refs.hoursEl.textContent = '00';
-        refs.minutesEl.textContent = '00';
-        refs.secondsEl.textContent = '00';
+        refs.timerValueEls.forEach(elem => elem.textContent = '00');
     },
 });
 
 function onStartTimer() {
     const { days, hours, minutes, seconds } = convertMs(saleEndDate - Date.now());
     if (seconds < 0) {
-        startBtnAnabled();
+        AnableStartBtn();
         return '';
     }
     refs.daysEl.textContent = addLeadingZero(days);
@@ -86,10 +82,10 @@ function notifyFailure() {
     });
 }
 
-function startBtnDisabled() {
-    refs.startTimerBtnEL.setAttribute('disabled', 'true');
+function disableStartBtn() {
+    refs.startTimerBtn.setAttribute('disabled', 'true');
 }
 
-function startBtnAnabled() {
-    refs.startTimerBtnEL.removeAttribute('disabled');
+function AnableStartBtn() {
+    refs.startTimerBtn.removeAttribute('disabled');
 }

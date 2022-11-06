@@ -8,10 +8,15 @@ refs.form.addEventListener('submit', onFormSubmit);
 
 function onFormSubmit(e) {
   e.preventDefault();
-  const { delay, step, amount } = e.currentTarget.elements;
 
-  for (let i = 1; i <= amount.value; i += 1) {
-    const currentDelay = +delay.value + i * step.value;
+  const {
+    delay: { value: delay },
+    step: { value: step },
+    amount: { value: amount }
+  } = e.currentTarget.elements;
+
+  for (let i = 1; i <= amount; i += 1) {
+    const currentDelay = Number(delay) + i * step;
     setTimeout(() => {
       createPromise(i, currentDelay)
         .then(({ position, delay }) => {
@@ -26,11 +31,14 @@ function onFormSubmit(e) {
 
 function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
-  if (shouldResolve) {
-    return Promise.resolve({ position, delay });
-  } else {
-    return Promise.reject({ position, delay });
-  }
+  return new Promise((resolve, reject) => {
+    if (shouldResolve) {
+      resolve({ position, delay });
+    } else {
+      reject({ position, delay });
+    }
+  });
+
 }
 
 function notifyFailure(position, delay) {
