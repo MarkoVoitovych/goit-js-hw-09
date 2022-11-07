@@ -6,10 +6,6 @@ const refs = {
     calendarEl: document.querySelector('[id = "datetime-picker"]'),
     startTimerBtn: document.querySelector('[data-start]'),
     timerValueEls: document.querySelectorAll('.value'),
-    daysEl: document.querySelector('[data-days]'),
-    hoursEl: document.querySelector('[data-hours]'),
-    minutesEl: document.querySelector('[data-minutes]'),
-    secondsEl: document.querySelector('[data-seconds]'),
 };
 
 let saleEndDate = null;
@@ -24,6 +20,17 @@ refs.startTimerBtn.addEventListener('click', () => {
     disableStartBtn();
 });
 
+function onStartTimer() {
+    const deltaTime = convertMs(saleEndDate - Date.now());
+    if (deltaTime.seconds < 0) {
+        anableStartBtn();
+        return '';
+    }
+    Object.entries(deltaTime).forEach(([key, value], index) => {
+        [...refs.timerValueEls][index].textContent = addLeadingZero(value);
+    });
+}
+
 flatpickr(refs.calendarEl, {
     enableTime: true,
     time_24hr: true,
@@ -35,24 +42,12 @@ flatpickr(refs.calendarEl, {
             notifyFailure();
             return '';
         }
-        AnableStartBtn();
+        anableStartBtn();
         saleEndDate = selectedDates[0];
         clearInterval(timerId);
         refs.timerValueEls.forEach(elem => elem.textContent = '00');
     },
 });
-
-function onStartTimer() {
-    const { days, hours, minutes, seconds } = convertMs(saleEndDate - Date.now());
-    if (seconds < 0) {
-        AnableStartBtn();
-        return '';
-    }
-    refs.daysEl.textContent = addLeadingZero(days);
-    refs.hoursEl.textContent = addLeadingZero(hours);
-    refs.minutesEl.textContent = addLeadingZero(minutes);
-    refs.secondsEl.textContent = addLeadingZero(seconds);
-}
 
 function addLeadingZero(value) {
     return String(value).padStart(2, 0);
@@ -86,6 +81,6 @@ function disableStartBtn() {
     refs.startTimerBtn.setAttribute('disabled', 'true');
 }
 
-function AnableStartBtn() {
+function anableStartBtn() {
     refs.startTimerBtn.removeAttribute('disabled');
 }
