@@ -10,22 +10,16 @@ function onFormSubmit(e) {
   e.preventDefault();
 
   const {
-    delay: { value: delay },
-    step: { value: step },
-    amount: { value: amount }
+    delay: { value: delayValue },
+    step: { value: stepValue },
+    amount: { value: amountValue }
   } = e.currentTarget.elements;
 
-  for (let i = 1; i <= amount; i += 1) {
-    const currentDelay = Number(delay) + i * step;
-    setTimeout(() => {
-      createPromise(i, currentDelay)
-        .then(({ position, delay }) => {
-          notifySuccess(position, delay);
-        })
-        .catch(({ position, delay }) => {
-          notifyFailure(position, delay);
-        });
-    }, currentDelay);
+  for (let i = 1; i <= amountValue; i += 1) {
+    const currentDelay = Number(delayValue) + i * stepValue;
+    createPromise(i, currentDelay)
+      .then(({ position, delay }) => notifySuccess(position, delay))
+      .catch(({ position, delay }) => notifyFailure(position, delay));
   }
 }
 
@@ -33,9 +27,9 @@ function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
   return new Promise((resolve, reject) => {
     if (shouldResolve) {
-      resolve({ position, delay });
+      setTimeout(resolve, delay, { position, delay });
     } else {
-      reject({ position, delay });
+      setTimeout(reject, delay, { position, delay });
     }
   });
 
